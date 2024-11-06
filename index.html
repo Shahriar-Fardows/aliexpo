@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Data Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div id="app" class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Product Data Collection</h1>
+        
+        <div id="keyInput" class="mb-6">
+            <label for="dbKey" class="block text-sm font-medium text-gray-700 mb-2">Enter your database key:</label>
+            <input type="text" id="dbKey" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <button onclick="setDatabaseKey()" class="mt-3 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Set Key
+            </button>
+        </div>
+
+        <form id="productForm" class="hidden">
+            <div class="space-y-4">
+                <div>
+                    <label for="aliexpressUrl" class="block text-sm font-medium text-gray-700">AliExpress URL:</label>
+                    <input type="text" id="aliexpressUrl" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Price:</label>
+                    <input type="text" id="price" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Category:</label>
+                    <input type="text" id="category" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="shippingTime" class="block text-sm font-medium text-gray-700">Shipping Time:</label>
+                    <select id="shippingTime" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Select Shipping Time</option>
+                        <option value="1-5 days">1-5 days</option>
+                        <option value="5-10 days">5-10 days</option>
+                        <option value="10-15 days">10-15 days</option>
+                    </select>
+                </div>                
+                <div>
+                    <label for="shippingCost" class="block text-sm font-medium text-gray-700">Shipping Cost:</label>
+                    <input id="shippingCost" type="text" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" value="Free Shipping">
+                </div>
+                
+                <div>
+                    <label for="averageRating" class="block text-sm font-medium text-gray-700">Average Rating:</label>
+                    <select id="averageRating" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="4.1⭐">4.1⭐</option>
+                        <option value="4.2⭐⭐">4.2⭐</option>
+                        <option value="4.3⭐⭐⭐">4.3⭐</option>
+                        <option value="4.4⭐⭐⭐⭐">4.4⭐</option>
+                        <option value="4.5⭐⭐⭐⭐⭐">4.5⭐</option>
+                        <option value="4.6⭐⭐⭐⭐⭐⭐">4.6⭐</option>
+                        <option value="4.7⭐⭐⭐⭐⭐⭐⭐">4.7⭐</option>
+                        <option value="4.8⭐⭐⭐⭐⭐⭐⭐⭐">4.8⭐</option>
+                        <option value="4.9⭐⭐⭐⭐⭐⭐⭐⭐⭐">4.9⭐</option>
+                        <option value="5⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐">5⭐⭐</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="mt-6 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Submit
+            </button>
+        </form>
+    </div>
+
+    <script>
+        let apiEndpoint = '';
+
+        function setDatabaseKey() {
+            const dbKey = document.getElementById('dbKey').value.trim();
+            if (dbKey) {
+                apiEndpoint = `https://sheetdb.io/api/v1/${dbKey}`;
+                document.getElementById('keyInput').classList.add('hidden');
+                document.getElementById('productForm').classList.remove('hidden');
+            } else {
+                alert('Please enter a valid database key.');
+            }
+        }
+
+        function truncateUrl(url) {
+            const htmlIndex = url.indexOf('.html');
+            return htmlIndex !== -1 ? url.substring(0, htmlIndex + 5) : url;
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!apiEndpoint) {
+                alert('Please set the database key first.');
+                return;
+            }
+
+            const formData = {
+                AliExpressURL: truncateUrl(document.getElementById('aliexpressUrl').value),
+                Price: document.getElementById('price').value,
+                Category: document.getElementById('category').value,
+                ShippingTime: document.getElementById('shippingTime').value,
+                ShippingCost: document.getElementById('shippingCost').value,
+                AverageRating: document.getElementById('averageRating').value
+            };
+
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('Data submitted successfully!');
+                    this.reset();
+                } else {
+                    throw new Error('Failed to submit data');
+                }
+            } catch (error) {
+                alert('Error submitting data: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
